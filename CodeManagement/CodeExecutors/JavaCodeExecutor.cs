@@ -5,12 +5,12 @@ using System.Runtime.InteropServices;
 
 namespace CodeManagement.CodeExecutors
 {
-    public class JavaCodeExecutor : ICodeExecutor
+    public class JavaCodeExecutor : BaseCodeExecutor
     {
         [DllImport("kernel32.dll", SetLastError = true)]
         static extern int SetErrorMode(int wMode);
 
-        public bool Compile(string codeFilePath)
+        public override bool Compile(string codeFilePath)
         {
             var process = new Process { StartInfo = this.GetProcessStartInfoForCompilation(codeFilePath) };
 
@@ -21,20 +21,19 @@ namespace CodeManagement.CodeExecutors
             }
             catch (Exception e)
             {
-                this.WriteSystemExceptionToFile(e.Message);
-                return false;
+                throw new Exception("Process start caused an exception while compiling");
             }
 
             if (process.ExitCode != 0)
             {
-                this.WriteCompilationErrorsToFile(codeFilePath, process.StandardError.ReadToEnd());
+                this.WriteErrorToFile(codeFilePath, process.StandardError.ReadToEnd());
                 return false;
             }
 
             return true;
         }
 
-        public bool Run(string classFilePath)
+        public override bool Run(string classFilePath)
         {
             var process = new Process { StartInfo = this.GetProcessStartInfoForExecution(classFilePath) };
 
@@ -45,34 +44,17 @@ namespace CodeManagement.CodeExecutors
             }
             catch(Exception e)
             {
-                this.WriteSystemExceptionToFile(e.Message);
-
-                return false;
+                throw new Exception("Process start caused an exception while running the code");
             }
 
             if (process.ExitCode != 0)
             {
-                this.WriteCodeExceptionToFile(classFilePath, process.StandardError.ReadToEnd());
+                this.WriteErrorToFile(classFilePath, process.StandardError.ReadToEnd());
 
                 return false;
             }
 
             return true;
-        }
-
-        private void WriteCodeExceptionToFile(string codeFilePath, string readToEnd)
-        {
-            // TODO : Write the exception to file
-        }
-
-        private void WriteCompilationErrorsToFile(string codeFilePath, string compilationErrors)
-        {
-            //TODO: Write the compilation error details to file
-        }
-
-        private void WriteSystemExceptionToFile(string message)
-        {
-            //TODO: Write the exception to file
         }
 
         private ProcessStartInfo GetProcessStartInfoForCompilation(string codeFilePath)

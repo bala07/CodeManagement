@@ -8,13 +8,13 @@ using Microsoft.CSharp;
 
 namespace CodeManagement.CodeExecutors
 {
-    class CSharpCodeExecutor : ICodeExecutor
+    class CSharpCodeExecutor : BaseCodeExecutor
     {
 
         [DllImport("kernel32.dll", SetLastError = true)]
         static extern int SetErrorMode(int wMode);
 
-        public bool Compile(string codeFilePath)
+        public override bool Compile(string codeFilePath)
         {
             var compilerParameters = this.GetCompilerParameters(codeFilePath);
 
@@ -26,12 +26,12 @@ namespace CodeManagement.CodeExecutors
                 return true;
             }
 
-            this.HandleCompilationErrors(compilerResults);
+            this.HandleCompilationErrors(compilerResults, codeFilePath);
 
             return false;
         }
 
-        public bool Run(string codeFilePath)
+        public override bool Run(string codeFilePath)
         {
             var oldMode = this.SuppressWindowsErrorDialogMode();
 
@@ -44,9 +44,7 @@ namespace CodeManagement.CodeExecutors
             }
             catch (Exception e)
             {
-                this.WriteExceptionDetailsToFile(e.Message);
-
-                return false;
+                throw new Exception("Process start caused an exception");
             }
             finally
             {
@@ -58,7 +56,7 @@ namespace CodeManagement.CodeExecutors
                 return true;
             }
 
-            this.WriteErrorToFile(process.StandardError.ReadToEnd());
+            this.WriteErrorToFile(process.StandardError.ReadToEnd(), codeFilePath);
 
             return false;
         }
@@ -96,19 +94,17 @@ namespace CodeManagement.CodeExecutors
             return Path.GetDirectoryName(codeFilePath) + "\\" + Path.GetFileNameWithoutExtension(codeFilePath) + ".exe";
         }
 
-        private void HandleCompilationErrors(CompilerResults compilerResults)
+        private void HandleCompilationErrors(CompilerResults compilerResults, string codeFilePath)
         {
-            //TODO: Write compilation errors to file
-        }
+            var compilationErrors = "";
 
-        private void WriteExceptionDetailsToFile(string message)
-        {
-            //TODO: Write exception details to file
-        }
+            foreach (var error in compilerResults.Errors)
+            {
+                compilationErrors += error + "\n";
+            }
 
-        private void WriteErrorToFile(string readToEnd)
-        {
-            //TODO: Write the error to a file
+            this.WriteErrorToFile(codeFilePath, compilationErrors);
+
         }
 
         private int SuppressWindowsErrorDialogMode()
