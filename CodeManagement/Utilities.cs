@@ -27,5 +27,17 @@ namespace CodeManagement
                 return fileReader.ReadToEnd();
             }
         }
+
+        public static string GetFormattedCommandLineParameters(string[] parameters)
+        {
+            string arguments = "";
+
+            foreach (var parameter in parameters)
+            {
+                arguments += parameter + " ";
+            }
+
+            return arguments.Trim();
+        }
     }
 }

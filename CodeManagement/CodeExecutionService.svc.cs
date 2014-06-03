@@ -6,14 +6,14 @@
         {
             var codeExecutor = CodeExecutorFactory.GetCodeExecutor(codeFilePath);
 
-            return codeExecutor.Compile(codeFilePath);
+            return codeExecutor.Compile(codeFilePath);  
         }
 
-        public bool Run(string codeFilePath)
+        public bool Run(string codeFilePath, string[] commandLineParameters)
         {
             var codeExecutor = CodeExecutorFactory.GetCodeExecutor(codeFilePath);
 
-            return codeExecutor.Run(codeFilePath);
+            return codeExecutor.Run(codeFilePath, commandLineParameters);
         }
     }
 }

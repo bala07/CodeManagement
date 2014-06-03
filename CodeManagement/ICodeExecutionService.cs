@@ -9,6 +9,6 @@ namespace CodeManagement
         bool Compile(string codeFilePath);
 
         [OperationContract]
-        bool Run(string codeFilePath);
+        bool Run(string codeFilePath, string[] commandLineParameters);
     }
 }

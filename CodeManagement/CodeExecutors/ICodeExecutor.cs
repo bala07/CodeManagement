@@ -4,6 +4,6 @@
     {
         bool Compile(string codeFilePath);
 
-        bool Run(string codeFilePath);
+        bool Run(string codeFilePath, string[] commandLineParameters);
     }
 }

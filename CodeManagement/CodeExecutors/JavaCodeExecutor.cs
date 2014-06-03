@@ -33,7 +33,7 @@ namespace CodeManagement.CodeExecutors
             return true;
         }
 
-        public override bool Run(string classFilePath)
+        public override bool Run(string classFilePath, string[] commandLineParameters)
         {
             var process = new Process { StartInfo = this.GetProcessStartInfoForExecution(classFilePath) };
 

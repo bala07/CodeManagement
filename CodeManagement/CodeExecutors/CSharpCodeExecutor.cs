@@ -17,6 +17,12 @@ namespace CodeManagement.CodeExecutors
         public override bool Compile(string codeFilePath)
         {
             var compilerParameters = this.GetCompilerParameters(codeFilePath);
+            compilerParameters.ReferencedAssemblies.Add(
+                @"C:\Users\Balasubramanian N\Documents\Visual Studio 2012\Projects\OnlineJudge\Testers\bin\Debug\Service.dll");
+            compilerParameters.ReferencedAssemblies.Add(
+                @"C:\Users\Balasubramanian N\Documents\Visual Studio 2012\Projects\OnlineJudge\Testers\bin\Debug\Domain.dll");
+            compilerParameters.ReferencedAssemblies.Add(
+                @"C:\Users\Balasubramanian N\Documents\Visual Studio 2012\Projects\OnlineJudge\Testers\bin\Debug\Testers.dll");
 
             var codeProvider = new CSharpCodeProvider();
             var compilerResults = codeProvider.CompileAssemblyFromFile(compilerParameters, new[] { codeFilePath });
@@ -31,11 +37,11 @@ namespace CodeManagement.CodeExecutors
             return false;
         }
 
-        public override bool Run(string codeFilePath)
+        public override bool Run(string codeFilePath, string[] commandLineParameters)
         {
             var oldMode = this.SuppressWindowsErrorDialogMode();
 
-            var process = new Process { StartInfo = this.GetProcessStartInfo(codeFilePath) };
+            var process = new Process { StartInfo = this.GetProcessStartInfo(codeFilePath, commandLineParameters) };
 
             try
             {
@@ -56,7 +62,7 @@ namespace CodeManagement.CodeExecutors
                 return true;
             }
 
-            this.WriteErrorToFile(process.StandardError.ReadToEnd(), codeFilePath);
+            this.WriteErrorToFile(codeFilePath, process.StandardError.ReadToEnd());
 
             return false;
         }
@@ -73,7 +79,7 @@ namespace CodeManagement.CodeExecutors
             };
         }
 
-        private ProcessStartInfo GetProcessStartInfo(string codeFilePath)
+        private ProcessStartInfo GetProcessStartInfo(string codeFilePath, string[] commandLineParameters)
         {
             var codeFileDirectoryPath = Path.GetDirectoryName(codeFilePath);
 
@@ -85,7 +91,8 @@ namespace CodeManagement.CodeExecutors
                 ErrorDialog = false,
                 CreateNoWindow = true,
                 RedirectStandardError = true,
-                RedirectStandardOutput = true
+                RedirectStandardOutput = true,
+                Arguments = Utilities.GetFormattedCommandLineParameters(commandLineParameters)
             };
         }
 
@@ -116,5 +123,6 @@ namespace CodeManagement.CodeExecutors
         {
             SetErrorMode(oldMode);
         }
+
     }
 }

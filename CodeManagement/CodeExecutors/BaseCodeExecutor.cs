@@ -7,7 +7,7 @@
             return false;
         }
 
-        public virtual bool Run(string codeFilePath)
+        public virtual bool Run(string codeFilePath, string[] commandLineParameters)
         {
             return false;
         }
